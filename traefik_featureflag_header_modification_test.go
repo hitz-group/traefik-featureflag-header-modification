@@ -1,4 +1,4 @@
-package featureflag_header_modification_test
+package traefik_featureflag_header_modification_test
 
 import (
 	"context"
@@ -6,16 +6,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	featureflag_header_modification "github.com/hitz-group/traefik-featureflag-header-modification"
+	traefik_featureflag_header_modification "github.com/hitz-group/traefik-featureflag-header-modification"
 )
 
 func TestXRequestStart(t *testing.T) {
-	cfg := featureflag_header_modification.CreateConfig()
+	cfg := traefik_featureflag_header_modification.CreateConfig()
 
 	ctx := context.Background()
 	next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {})
 
-	handler, err := featureflag_header_modification.New(ctx, next, cfg, "featureflag_header_modification")
+	handler, err := traefik_featureflag_header_modification.New(ctx, next, cfg, "traefik_featureflag_header_modification")
 	if err != nil {
 		t.Fatal(err)
 	}

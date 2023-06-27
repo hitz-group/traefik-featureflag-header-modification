@@ -1,5 +1,5 @@
 // Package featureflag_header-modfication a plugin for traefik which adds request header.
-package featureflag_header_modification
+package traefik_featureflag_header_modification
 
 import (
 	"bytes"
