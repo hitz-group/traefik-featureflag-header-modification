@@ -98,7 +98,7 @@ func (config *FeatureflagHeaderModification) ServeHTTP(rw http.ResponseWriter, r
 	}
 
 	os.Stdout.WriteString("Flipt endpoint: " + config.fliptEndpoint + "\n")
-	os.Stdout.WriteString("Flipt payload: " + `{"entityId":"` + org + `","flagKey":"` + config.flagKey + `","context":{"` + config.contextProperty + `":"` + org + `"}}\n`)
+	os.Stdout.WriteString("Flipt payload: " + `{"entityId":"` + org + `","flagKey":"` + config.flagKey + `","context":{"` + config.contextProperty + `":"` + org + `"}}` + "\n")
 
 	payload := []byte(`{"entityId":"` + org + `","flagKey":"` + config.flagKey + `","context":{"` + config.contextProperty + `":"` + org + `"}}`)
 
@@ -112,7 +112,7 @@ func (config *FeatureflagHeaderModification) ServeHTTP(rw http.ResponseWriter, r
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-	os.Stdout.WriteString("Flipt response: " + string(body))
+	os.Stdout.WriteString("Flipt response: " + string(body) + "\n")
 	if err != nil {
 		os.Stderr.WriteString("Error while reading response: " + err.Error())
 		config.next.ServeHTTP(rw, req)
