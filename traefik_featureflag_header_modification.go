@@ -87,17 +87,20 @@ func (config *FeatureflagHeaderModification) ServeHTTP(rw http.ResponseWriter, r
 			break
 		}
 	}
-	os.Stdout.WriteString("traefik featuer flag header modification" + org)
+	os.Stdout.WriteString("traefik featuer flag header modification " + org + "\n")
 	if len(org) == 0 {
 		config.next.ServeHTTP(rw, req)
 		return
 	}
 
+	os.Stdout.WriteString("Flipt endpoint: " + config.fliptEndpoint + "\n")
+	os.Stdout.WriteString("Flipt payload: " + `{"entityId":"` + org + `","flagKey":"` + config.flagKey + `","context":{"` + orgHeaderName + `":"` + org + `"}}\n`)
+
 	payload := []byte(`{"entityId":"` + org + `","flagKey":"` + config.flagKey + `","context":{"` + orgHeaderName + `":"` + org + `"}}`)
 
 	resp, err := http.Post(config.fliptEndpoint, "application/json", bytes.NewBuffer(payload))
 	if err != nil {
-		os.Stderr.WriteString("Error when getting feature flag:" + err.Error())
+		os.Stderr.WriteString("Error when getting feature flag: " + err.Error())
 		config.next.ServeHTTP(rw, req)
 		return
 	}
@@ -105,8 +108,9 @@ func (config *FeatureflagHeaderModification) ServeHTTP(rw http.ResponseWriter, r
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	os.Stdout.WriteString("Flipt response: " + string(body))
 	if err != nil {
-		os.Stderr.WriteString("Error while reading response:" + err.Error())
+		os.Stderr.WriteString("Error while reading response: " + err.Error())
 		config.next.ServeHTTP(rw, req)
 		return
 	}
@@ -114,7 +118,7 @@ func (config *FeatureflagHeaderModification) ServeHTTP(rw http.ResponseWriter, r
 	var fliptEvaluateResponse FliptEvaluateResponse
 	err = json.Unmarshal(body, &fliptEvaluateResponse)
 	if err != nil {
-		os.Stderr.WriteString("Error while parsing response:" + err.Error())
+		os.Stderr.WriteString("Error while parsing response: " + err.Error())
 		config.next.ServeHTTP(rw, req)
 		return
 	}
