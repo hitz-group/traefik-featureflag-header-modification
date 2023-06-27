@@ -5,8 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	traefik_featureflag_header_modification "github.com/hitz-group/traefik-featureflag-header-modification"
+	"github.com/hitz-group/traefik-featureflag-header-modification"
 )
 
 func TestXRequestStart(t *testing.T) {

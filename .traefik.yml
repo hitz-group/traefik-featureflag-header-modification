@@ -6,4 +6,8 @@ import: github.com/hitz-group/traefik-featureflag-header-modification
 summary: 'Update request header by checking Flipt feature flag config'
 
 testData:
-  name: "featureflag_header_modification"
+  FlagKey: test
+  FliptEndpoint: http://localhost:3000
+  HeaderResult: x-feature-test
+  Headers:
+  - test
