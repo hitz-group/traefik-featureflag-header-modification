@@ -9,5 +9,6 @@ testData:
   FlagKey: test
   FliptEndpoint: http://localhost:3000
   HeaderResult: x-feature-test
+  ContextProperty: test
   Headers:
   - test

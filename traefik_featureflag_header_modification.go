@@ -14,10 +14,11 @@ import (
 
 // Config the plugin configuration.
 type Config struct {
-	Headers       []string
-	FliptEndpoint string
-	FlagKey       string
-	HeaderResult  string
+	Headers         []string
+	FliptEndpoint   string
+	FlagKey         string
+	HeaderResult    string
+	ContextProperty string
 }
 
 // CreateConfig creates the default plugin configuration.
@@ -31,12 +32,13 @@ func CreateConfig() *Config {
 
 // XRequestStart a traefik plugin.
 type FeatureflagHeaderModification struct {
-	next          http.Handler
-	headers       []string
-	fliptEndpoint string
-	flagKey       string
-	headerResult  string
-	name          string
+	next            http.Handler
+	headers         []string
+	fliptEndpoint   string
+	flagKey         string
+	headerResult    string
+	contextProperty string
+	name            string
 }
 
 type FliptEvaluateResponse struct {
@@ -66,24 +68,26 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 	if len(config.HeaderResult) == 0 {
 		return nil, fmt.Errorf("HeaderResult cannot be empty")
 	}
+	if len(config.ContextProperty) == 0 {
+		return nil, fmt.Errorf("ContextProperty cannot be empty")
+	}
 
 	return &FeatureflagHeaderModification{
-		headers:       config.Headers,
-		fliptEndpoint: config.FliptEndpoint,
-		flagKey:       config.FlagKey,
-		headerResult:  config.HeaderResult,
-		next:          next,
-		name:          name,
+		headers:         config.Headers,
+		fliptEndpoint:   config.FliptEndpoint,
+		flagKey:         config.FlagKey,
+		headerResult:    config.HeaderResult,
+		contextProperty: config.ContextProperty,
+		next:            next,
+		name:            name,
 	}, nil
 }
 
 func (config *FeatureflagHeaderModification) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	var org string
-	var orgHeaderName string
 	for i := 0; i < len(config.headers); i++ {
 		org = req.Header.Get(config.headers[i])
 		if len(org) != 0 {
-			orgHeaderName = config.headers[i]
 			break
 		}
 	}
@@ -94,11 +98,11 @@ func (config *FeatureflagHeaderModification) ServeHTTP(rw http.ResponseWriter, r
 	}
 
 	os.Stdout.WriteString("Flipt endpoint: " + config.fliptEndpoint + "\n")
-	os.Stdout.WriteString("Flipt payload: " + `{"entityId":"` + org + `","flagKey":"` + config.flagKey + `","context":{"` + orgHeaderName + `":"` + org + `"}}\n`)
+	os.Stdout.WriteString("Flipt payload: " + `{"entityId":"` + org + `","flagKey":"` + config.flagKey + `","context":{"` + config.contextProperty + `":"` + org + `"}}\n`)
 
-	payload := []byte(`{"entityId":"` + org + `","flagKey":"` + config.flagKey + `","context":{"` + orgHeaderName + `":"` + org + `"}}`)
+	payload := []byte(`{"entityId":"` + org + `","flagKey":"` + config.flagKey + `","context":{"` + config.contextProperty + `":"` + org + `"}}`)
 
-	resp, err := http.Post(config.fliptEndpoint, "application/json", bytes.NewBuffer(payload))
+	resp, err := http.Post(config.fliptEndpoint+"/api/v1/evaluate", "application/json", bytes.NewBuffer(payload))
 	if err != nil {
 		os.Stderr.WriteString("Error when getting feature flag: " + err.Error())
 		config.next.ServeHTTP(rw, req)
