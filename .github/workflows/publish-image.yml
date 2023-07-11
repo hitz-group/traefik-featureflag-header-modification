@@ -20,7 +20,7 @@ jobs:
           access_key_id: ${{ secrets.AWS_ACCESS_KEY }}
           secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
           account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-          repo: traefik
+          repo: public.ecr.aws/oolio/traefik
           region: us-east-1
           dockerfile: Dockerfile
           tags: ${{ github.sha }}
