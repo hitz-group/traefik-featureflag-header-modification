@@ -14,7 +14,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
         with:
-          path: go/src/github.com/${{ github.repository }}
           fetch-depth: 0
       - uses: kciter/aws-ecr-action@master
         with:
