@@ -12,13 +12,13 @@ jobs:
     steps:
       # https://github.com/marketplace/actions/checkout
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2 # More information on this action can be found below in the 'AWS Credentials' section
         with:
-          role-to-assume: arn:aws:iam::759617422752:user/CI-traefik-plugins
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
           aws-region: us-east-1
       - name: Login to Amazon ECR Public
         id: login-ecr-public
