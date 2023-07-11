@@ -1,17 +1,14 @@
-name: Main
+name: Publish Traefik image with plugin
 
 on:
   push:
     branches:
       - master
-    tags:
-      - v*
-  pull_request:
 
 jobs:
 
-  main:
-    name: Main Process
+  lint:
+    name: build image
     runs-on: ubuntu-latest
     env:
       GO_VERSION: 1.15
@@ -23,7 +20,6 @@ jobs:
         working-directory: ${{ github.workspace }}/go/src/github.com/${{ github.repository }}
 
     steps:
-
       # https://github.com/marketplace/actions/setup-go-environment
       - name: Set up Go ${{ env.GO_VERSION }}
         uses: actions/setup-go@v2
@@ -72,3 +68,26 @@ jobs:
         run: make yaegi_test
         env:
           GOPATH: ${{ github.workspace }}/go
+
+  image:
+    name: build image
+    needs: [lint]
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/marketplace/actions/checkout
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          path: go/src/github.com/${{ github.repository }}
+          fetch-depth: 0
+      - uses: kciter/aws-ecr-action@master
+        with:
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY }}
+          secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
+          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          repo: traefik
+          region: us-east-1
+          dockerfile: Dockerfile
+          tags: ${{ github.sha }}
+          create_repo: false
